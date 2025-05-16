@@ -1,0 +1,40 @@
+[
+  { 
+    "name": "Introduction to AI", 
+    "enrolled": 1500, 
+    "instructor": "Alex Morgan",
+    "price": "$220",
+    "rating": 4.9,
+    "level": "Intermediate",
+    "image": "/api/placeholder/320/180",
+    "tag": "Bestseller"
+  },
+  { 
+    "name": "Web Development Bootcamp", 
+    "enrolled": 1323, 
+    "instructor": "Emily Parker",
+    "price": "$199",
+    "rating": 4.8,
+    "level": "Beginner to Advanced",
+    "image": "/api/placeholder/320/180",
+    "tag": "Hot & New" 
+  },
+  { 
+    "name": "Digital Marketing Mastery", 
+    "enrolled": 975, 
+    "instructor": "David Johnson",
+    "price": "$175",
+    "rating": 4.7,
+    "level": "All Levels",
+    "image": "/api/placeholder/320/180" 
+  },
+  { 
+    "name": "UX/UI Design Principles", 
+    "enrolled": 875, 
+    "instructor": "Nina Rodriguez",
+    "price": "$210",
+    "rating": 4.8,
+    "level": "Intermediate",
+    "image": "/api/placeholder/320/180" 
+  }
+]
