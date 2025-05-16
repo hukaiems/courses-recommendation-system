@@ -1,0 +1,29 @@
+[
+  { 
+    "name": "Mastering UI Design", 
+    "enrolled": 500, 
+    "instructor": "John Mayers",
+    "price": "$200",
+    "rating": 4.8,
+    "level": "Intermediate",
+    "image": "/api/placeholder/320/180"
+  },
+  { 
+    "name": "Frontend Development", 
+    "enrolled": 330, 
+    "instructor": "Sarah Wilson",
+    "price": "$180",
+    "rating": 4.7,
+    "level": "Beginner",
+    "image": "/api/placeholder/320/180" 
+  },
+  { 
+    "name": "Data Science Essentials", 
+    "enrolled": 450, 
+    "instructor": "Michael Chen",
+    "price": "$250",
+    "rating": 4.9,
+    "level": "Advanced",
+    "image": "/api/placeholder/320/180" 
+  }
+]

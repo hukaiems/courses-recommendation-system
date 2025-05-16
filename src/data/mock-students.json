@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Emma Thompson",
+    "email": "emma.t@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 3,
+    "progress": 76,
+    "lastActive": "2 days ago",
+    "level": "Intermediate",
+    "badges": ["Top Performer", "Early Adopter"]
+  },
+  {
+    "id": 2,
+    "name": "Michael Chen",
+    "email": "michael.c@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 5,
+    "progress": 92,
+    "lastActive": "Today",
+    "level": "Advanced",
+    "badges": ["Course Creator", "Mentor"]
+  },
+  {
+    "id": 3,
+    "name": "Sofia Rodriguez",
+    "email": "sofia.r@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 2,
+    "progress": 45,
+    "lastActive": "1 week ago",
+    "level": "Beginner",
+    "badges": ["Quick Learner"]
+  },
+  {
+    "id": 4,
+    "name": "James Wilson",
+    "email": "james.w@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 7,
+    "progress": 88,
+    "lastActive": "Yesterday",
+    "level": "Advanced",
+    "badges": ["Subject Expert", "Most Engaged"]
+  },
+  {
+    "id": 5,
+    "name": "Aisha Patel",
+    "email": "aisha.p@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 4,
+    "progress": 65,
+    "lastActive": "3 days ago",
+    "level": "Intermediate",
+    "badges": ["Team Leader"]
+  },
+  {
+    "id": 6,
+    "name": "Lucas Garcia",
+    "email": "lucas.g@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 1,
+    "progress": 22,
+    "lastActive": "Just now",
+    "level": "Beginner",
+    "badges": ["New Member"]
+  },
+  {
+    "id": 7,
+    "name": "Nina Johnson",
+    "email": "nina.j@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 6,
+    "progress": 97,
+    "lastActive": "Today",
+    "level": "Advanced",
+    "badges": ["Certificate Collector", "Mentor"]
+  },
+  {
+    "id": 8,
+    "name": "Omar Ahmed",
+    "email": "omar.a@example.com",
+    "avatar": "/api/placeholder/40/40",
+    "courses": 3,
+    "progress": 59,
+    "lastActive": "5 days ago",
+    "level": "Intermediate",
+    "badges": ["Group Leader"]
+  }
+]
