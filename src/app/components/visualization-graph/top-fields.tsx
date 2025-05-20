@@ -72,7 +72,7 @@ const TopFieldsCharts = () => {
           </Pie>
           <Tooltip
             formatter={(value: number) => value.toLocaleString()}
-            separator=" users"
+            separator=", Users: "
           />
           <Legend
             layout="vertical"
