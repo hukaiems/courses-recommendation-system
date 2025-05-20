@@ -19,6 +19,8 @@ function MainPageContent() {
       <TeamSection />
 
       <ProjectIntroductionSection />
+
+      {/* <MoocubexIntroduction/> */}
     </div>
   );
 }
