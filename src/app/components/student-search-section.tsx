@@ -2,37 +2,36 @@
 import { useState } from "react";
 import {
   Search,
-  UserCheck,
-  Mail,
-  Award,
   User,
   ChevronDown,
   ChevronUp,
   BookOpen,
 } from "lucide-react";
-import mockStudents from "../../data/mock-students.json";
+import axios from "axios";
+
+// define the type for student API data
+interface Student {
+  id: string;
+  name: string;
+}
 
 function StudentSearchSection() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [students, setStudents] = useState<Student[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [expandedStudentId, setExpandedStudentId] = useState<number | null>(
+  const [expandedStudentId, setExpandedStudentId] = useState<string | null>(
     null
   );
 
   // Filter students based on search query
-  const filteredStudents = mockStudents.filter(
-    (student) =>
-      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowResults(true);
-  };
+  // const students = mockStudents.filter(
+  //   (student) =>
+  //     student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     student.email.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   // Toggle expanded state for a student
-  const toggleRecommendedCourses = (studentId: number) => {
+  const toggleRecommendedCourses = (studentId: string) => {
     if (expandedStudentId === studentId) {
       setExpandedStudentId(null);
     } else {
@@ -48,6 +47,33 @@ function StudentSearchSection() {
     { id: 4, title: "UX Design Principles", duration: "4 weeks" },
     { id: 5, title: "Cloud Architecture", duration: "12 weeks" },
   ];
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) {
+      console.log("Empty query—nothing to search");
+      setShowResults(false);
+      return;
+    }
+    console.log("Searching for:", query);
+    try {
+      // params place below the URL
+      const response = await axios.get(
+        "https://cs313-backend.onrender.com/api/get_student_by_name",
+        {
+          params: { query: query },
+        }
+      );
+      // remember to set response.data.data to get to the array
+      setStudents(response.data.data);
+      setShowResults(true);
+    } catch (err) {
+      console.log("Error getting student: ", err);
+      setStudents([]);
+      setShowResults(true);
+    }
+  };
 
   return (
     <div className="mb-12">
@@ -81,19 +107,18 @@ function StudentSearchSection() {
       {/* Results List */}
       {showResults && (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          {filteredStudents.length > 0 ? (
+          {students.length > 0 ? (
             <>
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <p className="text-gray-700">
-                  Found{" "}
-                  <span className="font-bold">{filteredStudents.length}</span>{" "}
+                  Found <span className="font-bold">{students.length}</span>{" "}
                   students matching &ldquo;
                   <span className="font-bold">{searchQuery}</span>&rdquo;
                 </p>
               </div>
 
               <ul className="divide-y divide-gray-200">
-                {filteredStudents.map((student) => (
+                {students.map((student) => (
                   <li
                     key={student.id}
                     className="p-4 hover:bg-gray-50 transition-colors"
@@ -107,32 +132,15 @@ function StudentSearchSection() {
                       {/* Student basic info */}
                       <div className="flex-grow">
                         <h3 className="font-bold text-black">{student.name}</h3>
-                        <div className="flex items-center text-gray-500 text-sm">
-                          <Mail size={14} className="mr-1" />
-                          {student.email}
-                        </div>
-                      </div>
-
-                      {/* Student details */}
-                      <div className="flex flex-col items-start gap-2 min-w-32">
-                        <div className="flex items-center">
-                          <UserCheck size={16} className="mr-2 text-blue-500" />
-                          <span className="text-sm">
-                            Active {student.lastActive}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <Award size={16} className="mr-2 text-blue-500" />
-                          <span className="text-sm">{student.level} Level</span>
-                        </div>
                       </div>
 
                       {/* Course count and action button */}
                       <div className="flex flex-col items-center gap-2 ml-4">
                         <div className="text-center">
-                          <div className="font-bold text-lg text-blue-600">
+                          {/* keeping the code for later on if I needed it */}
+                          {/* <div className="font-bold text-lg text-blue-600">
                             {student.courses}
-                          </div>
+                          </div> */}
                           <div className="text-xs text-gray-500">Courses</div>
                         </div>
                         <button className="bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm px-3 py-1 rounded font-medium transition-colors">
