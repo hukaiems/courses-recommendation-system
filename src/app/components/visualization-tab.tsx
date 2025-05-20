@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import MissingData from "./visualization-graph/missing-data";
 import ConsistencyChart from "./visualization-graph/consistency";
+import TopCourseCharts from "./visualization-graph/top-courses";
 import axios from "axios";
 
 // define api json overall data
@@ -30,13 +31,14 @@ export default function VisualizationTab() {
         return <MissingData />;
       case "consistency":
         return <ConsistencyChart />;
+      case "TopCourses":
+        return <TopCourseCharts />;
       default:
         return null;
     }
   };
 
   // get overall data
-
   useEffect(() => {
     const fetchOverallData = async () => {
       try {
@@ -106,6 +108,15 @@ export default function VisualizationTab() {
           onClick={() => setActiveTab("consistency")}
         >
           Consistency
+        </button>
+
+        <button
+          className={`px-4 py-2 rounded-t-md text-black ${
+            activeTab === "TopCourses" ? "bg-white font-bold" : "bg-blue-200"
+          }`}
+          onClick={() => setActiveTab("TopCourses")}
+        >
+          Top Courses
         </button>
       </div>
 
