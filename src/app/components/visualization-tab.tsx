@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import MissingData from "./visualization-graph/missing-data";
 import ConsistencyChart from "./visualization-graph/consistency";
 import TopCourseCharts from "./visualization-graph/top-courses";
+import TopFieldsCharts from "./visualization-graph/top-fields";
 import axios from "axios";
 
 // define api json overall data
@@ -33,6 +34,8 @@ export default function VisualizationTab() {
         return <ConsistencyChart />;
       case "TopCourses":
         return <TopCourseCharts />;
+      case "TopFields":
+        return <TopFieldsCharts />;
       default:
         return null;
     }
@@ -117,6 +120,15 @@ export default function VisualizationTab() {
           onClick={() => setActiveTab("TopCourses")}
         >
           Top Courses
+        </button>
+
+        <button
+          className={`px-4 py-2 rounded-t-md text-black ${
+            activeTab === "TopFields" ? "bg-white font-bold" : "bg-blue-200"
+          }`}
+          onClick={() => setActiveTab("TopFields")}
+        >
+          Top Fields
         </button>
       </div>
 
