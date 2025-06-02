@@ -26,7 +26,7 @@ const TopCourseCharts = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "https://cs313-backend.onrender.com/api/student_count_on_course"
+          "https://cs313-api-be31.onrender.com/course/user-counts"
         );
         setCourses(response.data.data);
       } catch (err) {
