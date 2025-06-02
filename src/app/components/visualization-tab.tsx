@@ -10,11 +10,12 @@ import axios from "axios";
 // define api json overall data
 
 const defaultOverallData = {
-  user_count: 0,
-  course_count: 0,
-  school_count: 0,
-  teacher_count: 0,
-  field_count: 0,
+  course: 0,
+  teacher: 0,
+  field: 0,
+  school: 0,
+  user: 0,
+  user_course: 0,
 };
 
 type OverallData = typeof defaultOverallData;
@@ -46,10 +47,11 @@ export default function VisualizationTab() {
     const fetchOverallData = async () => {
       try {
         const response = await axios.get(
-          "https://cs313-backend.onrender.com/api/overall"
+          "https://cs313-api-be31.onrender.com/summary"
         );
         // errors because API give array of so take the first one
-        setOverallData(response.data.data[0]);
+        console.log("<- API trả về:", response.data);
+        setOverallData(response.data.table_counts);
       } catch (err) {
         console.log("Failed to get data: ", err);
       }
@@ -62,34 +64,41 @@ export default function VisualizationTab() {
       {/* Stats summary */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-white p-4 rounded-md shadow">
-          <h3 className="text-gray-600 font-bold">Users</h3>
-          <p className="text-2xl font-bold text-black">
-            {overallData.user_count}
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-md shadow">
           <h3 className="text-gray-600 font-bold">Courses</h3>
           <p className="text-2xl font-bold text-black">
-            {overallData.course_count}
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-md shadow">
-          <h3 className="text-gray-600 font-bold">School</h3>
-          <p className="text-2xl font-bold text-black">
-            {overallData.school_count}
+            {overallData.course}
           </p>
         </div>
         <div className="bg-white p-4 rounded-md shadow">
           <h3 className="text-gray-600 font-bold">Teacher</h3>
           <p className="text-2xl font-bold text-black">
-            {overallData.teacher_count}
+            {overallData.teacher}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-md shadow">
+          <h3 className="text-gray-600 font-bold">Field</h3>
+          <p className="text-2xl font-bold text-black">
+            {overallData.field}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-md shadow">
+          <h3 className="text-gray-600 font-bold">School</h3>
+          <p className="text-2xl font-bold text-black">
+            {overallData.school}
           </p>
         </div>
 
         <div className="bg-white p-4 rounded-md shadow">
-          <h3 className="text-gray-600 font-bold">Field</h3>
+          <h3 className="text-gray-600 font-bold">User</h3>
           <p className="text-2xl font-bold text-black">
-            {overallData.field_count}
+            {overallData.user}
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-md shadow">
+          <h3 className="text-gray-600 font-bold">User course</h3>
+          <p className="text-2xl font-bold text-black">
+            {overallData.user_course}
           </p>
         </div>
       </div>
