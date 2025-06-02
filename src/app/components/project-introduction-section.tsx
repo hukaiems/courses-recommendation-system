@@ -1,4 +1,5 @@
 import Image from "next/image";
+import MoocubexIntroduction from "./moocubex-introduction";
 
 // Project Introduction Section Component
 export default function ProjectIntroductionSection() {
@@ -175,6 +176,8 @@ export default function ProjectIntroductionSection() {
           </div>
         </div>
       </div>
+
+      <MoocubexIntroduction/>
     </div>
   );
 }
