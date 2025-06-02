@@ -1,18 +1,15 @@
 "use client";
 import { useState } from "react";
-import {
-  Search,
-  User,
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-} from "lucide-react";
+import { Search, User, ChevronDown, ChevronUp, BookOpen, School, Users, Hash } from "lucide-react";
 import axios from "axios";
 
 // define the type for student API data
 interface Student {
   id: string;
   name: string;
+  gender: number;
+  school: string;
+  course_order: string; // This is a string like "{C_697791,C_682183}"
 }
 
 function StudentSearchSection() {
@@ -23,19 +20,39 @@ function StudentSearchSection() {
     null
   );
 
-  // Filter students based on search query
-  // const students = mockStudents.filter(
-  //   (student) =>
-  //     student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     student.email.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
   // Toggle expanded state for a student
   const toggleRecommendedCourses = (studentId: string) => {
     if (expandedStudentId === studentId) {
       setExpandedStudentId(null);
     } else {
       setExpandedStudentId(studentId);
+    }
+  };
+
+  // Helper function to parse course order string
+  const parseCourseOrder = (courseOrderString: string): string[] => {
+    if (!courseOrderString || typeof courseOrderString !== 'string') {
+      return [];
+    }
+    
+    // Remove curly braces and split by comma
+    const cleaned = courseOrderString.replace(/[{}]/g, '').trim();
+    if (!cleaned) {
+      return [];
+    }
+    
+    return cleaned.split(',').map(course => course.trim()).filter(course => course.length > 0);
+  };
+
+  // Helper function to get gender display text
+  const getGenderDisplay = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return { text: "Female", color: "bg-pink-100 text-pink-700" };
+      case 1:
+        return { text: "Male", color: "bg-blue-100 text-blue-700" };
+      default:
+        return { text: "Other", color: "bg-gray-100 text-gray-700" };
     }
   };
 
@@ -60,11 +77,8 @@ function StudentSearchSection() {
     try {
       // params place below the URL
       const response = await axios.get(
-        "https://cs313-backend.onrender.com/api/get_student_by_name",
-        {
-          params: { query: query },
-        }
-      );
+        `https://cs313-api-be31.onrender.com/user?name=${searchQuery}`);
+      
       // remember to set response.data.data to get to the array
       setStudents(response.data.data);
       setShowResults(true);
@@ -106,99 +120,151 @@ function StudentSearchSection() {
 
       {/* Results List */}
       {showResults && (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
           {students.length > 0 ? (
             <>
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <p className="text-gray-700">
-                  Found <span className="font-bold">{students.length}</span>{" "}
+                  Found <span className="font-bold text-blue-600">{students.length}</span>{" "}
                   students matching &ldquo;
-                  <span className="font-bold">{searchQuery}</span>&rdquo;
+                  <span className="font-bold text-gray-900">{searchQuery}</span>&rdquo;
                 </p>
               </div>
 
-              <ul className="divide-y divide-gray-200">
-                {students.map((student) => (
-                  <li
-                    key={student.id}
-                    className="p-4 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className="relative text-black">
-                        <User />
-                      </div>
-
-                      {/* Student basic info */}
-                      <div className="flex-grow">
-                        <h3 className="font-bold text-black">{student.name}</h3>
-                      </div>
-
-                      {/* Course count and action button */}
-                      <div className="flex flex-col items-center gap-2 ml-4">
-                        <div className="text-center">
-                          {/* keeping the code for later on if I needed it */}
-                          {/* <div className="font-bold text-lg text-blue-600">
-                            {student.courses}
-                          </div> */}
-                          <div className="text-xs text-gray-500">Courses</div>
+              <ul className="divide-y divide-gray-100">
+                {students.map((student) => {
+                  const genderInfo = getGenderDisplay(student.gender);
+                  const courseOrder = parseCourseOrder(student.course_order);
+                  
+                  return (
+                    <li
+                      key={student.id}
+                      className="p-6 hover:bg-gray-50/50 transition-all duration-200"
+                    >
+                      {/* Main Student Info Row */}
+                      <div className="flex items-start gap-4 mb-4">
+                        {/* Avatar */}
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
+                            <User size={20} />
+                          </div>
                         </div>
-                        <button className="bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm px-3 py-1 rounded font-medium transition-colors">
-                          View Profile
-                        </button>
-                      </div>
-                    </div>
 
-                    {/* Recommended courses with toggle functionality */}
-                    <div className="mt-4">
-                      <div className="w-1/5">
+                        {/* Student basic info */}
+                        <div className="flex-grow min-w-0">
+                          <h3 className="font-bold text-lg text-gray-900 mb-2">{student.name}</h3>
+                          
+                          {/* Student Details Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {/* School */}
+                            <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                              <School size={16} className="text-emerald-600 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">School</p>
+                                <p className="text-sm font-semibold text-emerald-900 truncate" title={student.school}>
+                                  {student.school}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Gender */}
+                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                              <Users size={16} className="text-gray-600 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">Gender</p>
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${genderInfo.color}`}>
+                                  {genderInfo.text}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Course Order */}
+                            <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                              <Hash size={16} className="text-amber-600 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-xs font-medium text-amber-700 uppercase tracking-wide">Course Order</p>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {courseOrder.length > 0 ? (
+                                    <>
+                                      {courseOrder.slice(0, 4).map((courseId, index) => (
+                                        <span
+                                          key={index}
+                                          className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full"
+                                          title={courseId}
+                                        >
+                                          {courseId.replace('C_', '')}
+                                        </span>
+                                      ))}
+                                      {courseOrder.length > 4 && (
+                                        <span className="inline-flex items-center justify-center w-6 h-6 bg-amber-200 text-amber-700 text-xs font-bold rounded-full">
+                                          +{courseOrder.length - 4}
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="text-xs text-amber-600 italic">No courses assigned</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Recommended courses with toggle functionality */}
+                      <div className="mt-4 pt-4 border-t border-gray-100">
                         <button
                           onClick={() => toggleRecommendedCourses(student.id)}
-                          className="w-1/2 flex items-center justify-between w-full text-left px-4 py-2 text-black bg-blue-200/60 hover:bg-gray-300 rounded transition-colors"
+                          className="flex items-center justify-between px-4 py-3 text-left bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-all duration-200 border border-blue-100 w-full md:w-auto min-w-[250px]"
                         >
-                          <span className="font-medium">
+                          <span className="font-medium text-gray-700 flex items-center gap-2">
+                            <BookOpen size={16} className="text-blue-600" />
                             Recommended Courses
                           </span>
                           {expandedStudentId === student.id ? (
-                            <ChevronUp size={20} />
+                            <ChevronUp size={20} className="text-gray-600" />
                           ) : (
-                            <ChevronDown size={20} />
+                            <ChevronDown size={20} className="text-gray-600" />
                           )}
                         </button>
-                      </div>
 
-                      {/* Expandable course list */}
-                      {expandedStudentId === student.id && (
-                        <div className="mt-2 w-full bg-gray-50 rounded p-3 border border-gray-200 animate-slideDown">
-                          <h4 className="text-sm font-bold text-xl text-gray-700 mb-2">
-                            Top Recommendations
-                          </h4>
-                          <ul className="space-y-2">
-                            {getRecommendedCourses().map((course) => (
-                              <li
-                                key={course.id}
-                                className="flex items-center justify-between text-sm p-2 hover:bg-white rounded-md"
-                              >
-                                <div className="flex items-center">
-                                  <BookOpen
-                                    size={16}
-                                    className="mr-2 text-blue-500"
-                                  />
-                                  <span className="text-black">
-                                    {course.title}
+                        {/* Expandable course list */}
+                        {expandedStudentId === student.id && (
+                          <div className="mt-3 bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                            <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Top Recommendations
+                            </h4>
+                            <ul className="space-y-2">
+                              {getRecommendedCourses().map((course, index) => (
+                                <li
+                                  key={course.id}
+                                  className="flex items-center justify-between text-sm p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                                      {index + 1}
+                                    </div>
+                                    <BookOpen
+                                      size={16}
+                                      className="text-blue-500 group-hover:text-blue-600 transition-colors"
+                                    />
+                                    <span className="text-gray-900 font-medium">
+                                      {course.title}
+                                    </span>
+                                  </div>
+                                  <span className="text-gray-500 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                                    {course.duration}
                                   </span>
-                                </div>
-                                <span className="text-gray-500">
-                                  {course.duration}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </>
           ) : (
