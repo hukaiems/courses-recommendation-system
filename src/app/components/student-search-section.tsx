@@ -51,7 +51,7 @@ function StudentSearchSection() {
       setRecommendedCourses([]);
     } else {
       setExpandedStudentId(studentId);
-      await getRecommendedCourses(studentId);
+      await getRecommendedCourses();
     }
   };
 
@@ -86,7 +86,7 @@ function StudentSearchSection() {
   };
 
   // Function to get recommended courses from local API
-  const getRecommendedCourses = async (userId: string) => {
+  const getRecommendedCourses = async () => {
     setLoadingRecommendations(true);
     try {
       const topK = 10; // Number of recommendations to fetch
