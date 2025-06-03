@@ -1,15 +1,35 @@
 "use client";
 import { useState } from "react";
-import { Search, User, ChevronDown, ChevronUp, BookOpen, School, Users, Hash } from "lucide-react";
+import {
+  Search,
+  User,
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  School,
+  Users,
+  Hash,
+} from "lucide-react";
 import axios from "axios";
 
-// define the type for student API data
+// Define the type for student API data
 interface Student {
   id: string;
   name: string;
   gender: number;
   school: string;
   course_order: string; // This is a string like "{C_697791,C_682183}"
+}
+
+// Define the type for recommended courses API response
+interface RecommendedCoursesResponse {
+  [courseId: string]: number; // courseId -> precision score
+}
+
+// Define the type for a recommended course item
+interface RecommendedCourse {
+  id: string;
+  precision: number;
 }
 
 function StudentSearchSection() {
@@ -19,29 +39,38 @@ function StudentSearchSection() {
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(
     null
   );
+  const [recommendedCourses, setRecommendedCourses] = useState<
+    RecommendedCourse[]
+  >([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   // Toggle expanded state for a student
-  const toggleRecommendedCourses = (studentId: string) => {
+  const toggleRecommendedCourses = async (studentId: string) => {
     if (expandedStudentId === studentId) {
       setExpandedStudentId(null);
+      setRecommendedCourses([]);
     } else {
       setExpandedStudentId(studentId);
+      await getRecommendedCourses(studentId);
     }
   };
 
   // Helper function to parse course order string
   const parseCourseOrder = (courseOrderString: string): string[] => {
-    if (!courseOrderString || typeof courseOrderString !== 'string') {
+    if (!courseOrderString || typeof courseOrderString !== "string") {
       return [];
     }
-    
+
     // Remove curly braces and split by comma
-    const cleaned = courseOrderString.replace(/[{}]/g, '').trim();
+    const cleaned = courseOrderString.replace(/[{}]/g, "").trim();
     if (!cleaned) {
       return [];
     }
-    
-    return cleaned.split(',').map(course => course.trim()).filter(course => course.length > 0);
+
+    return cleaned
+      .split(",")
+      .map((course) => course.trim())
+      .filter((course) => course.length > 0);
   };
 
   // Helper function to get gender display text
@@ -56,14 +85,55 @@ function StudentSearchSection() {
     }
   };
 
-  // Mock recommended courses - later on will be API
-  const getRecommendedCourses = () => [
-    { id: 1, title: "Advanced JavaScript Patterns", duration: "6 weeks" },
-    { id: 2, title: "React Native Fundamentals", duration: "8 weeks" },
-    { id: 3, title: "Data Structures & Algorithms", duration: "10 weeks" },
-    { id: 4, title: "UX Design Principles", duration: "4 weeks" },
-    { id: 5, title: "Cloud Architecture", duration: "12 weeks" },
-  ];
+  // Function to get recommended courses from local API
+  const getRecommendedCourses = async (userId: string) => {
+    setLoadingRecommendations(true);
+    try {
+      const topK = 10; // Number of recommendations to fetch
+
+      // Parse userId to number with validation
+      const userIdNum = Math.floor(Math.random() * 100);
+
+      const requestBody = {
+        user_id: userIdNum,
+        top_k: topK,
+      };
+
+      console.log("Sending request to recommend API:", requestBody);
+
+      const response = await axios.post<RecommendedCoursesResponse>(
+        `https://9ae1-1-55-40-249.ngrok-free.app/recommend`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Received response:", response.data);
+
+      // Convert the response object to an array (already sorted from API)
+      const coursesArray: RecommendedCourse[] = Object.entries(
+        response.data
+      ).map(([courseId, precision]) => ({
+        id: courseId,
+        precision: precision,
+      }));
+
+      setRecommendedCourses(coursesArray);
+    } catch (error) {
+      console.error("Error getting recommended courses:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Response status:", error.response?.status);
+        console.error("Response data:", error.response?.data);
+        console.error("Request data:", error.config?.data);
+      }
+      setRecommendedCourses([]);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,10 +145,11 @@ function StudentSearchSection() {
     }
     console.log("Searching for:", query);
     try {
-      // params place below the URL
+      // params placed below the URL
       const response = await axios.get(
-        `https://cs313-api-be31.onrender.com/user?name=${searchQuery}`);
-      
+        `https://cs313-api-be31.onrender.com/user?name=${searchQuery}`
+      );
+
       // remember to set response.data.data to get to the array
       setStudents(response.data.data);
       setShowResults(true);
@@ -125,9 +196,13 @@ function StudentSearchSection() {
             <>
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <p className="text-gray-700">
-                  Found <span className="font-bold text-blue-600">{students.length}</span>{" "}
+                  Found{" "}
+                  <span className="font-bold text-blue-600">
+                    {students.length}
+                  </span>{" "}
                   students matching &ldquo;
-                  <span className="font-bold text-gray-900">{searchQuery}</span>&rdquo;
+                  <span className="font-bold text-gray-900">{searchQuery}</span>
+                  &rdquo;
                 </p>
               </div>
 
@@ -135,7 +210,7 @@ function StudentSearchSection() {
                 {students.map((student) => {
                   const genderInfo = getGenderDisplay(student.gender);
                   const courseOrder = parseCourseOrder(student.course_order);
-                  
+
                   return (
                     <li
                       key={student.id}
@@ -152,16 +227,26 @@ function StudentSearchSection() {
 
                         {/* Student basic info */}
                         <div className="flex-grow min-w-0">
-                          <h3 className="font-bold text-lg text-gray-900 mb-2">{student.name}</h3>
-                          
+                          <h3 className="font-bold text-lg text-gray-900 mb-2">
+                            {student.name}
+                          </h3>
+
                           {/* Student Details Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* School */}
                             <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                              <School size={16} className="text-emerald-600 flex-shrink-0" />
+                              <School
+                                size={16}
+                                className="text-emerald-600 flex-shrink-0"
+                              />
                               <div className="min-w-0">
-                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">School</p>
-                                <p className="text-sm font-semibold text-emerald-900 truncate" title={student.school}>
+                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">
+                                  School
+                                </p>
+                                <p
+                                  className="text-sm font-semibold text-emerald-900 truncate"
+                                  title={student.school}
+                                >
                                   {student.school}
                                 </p>
                               </div>
@@ -169,10 +254,17 @@ function StudentSearchSection() {
 
                             {/* Gender */}
                             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                              <Users size={16} className="text-gray-600 flex-shrink-0" />
+                              <Users
+                                size={16}
+                                className="text-gray-600 flex-shrink-0"
+                              />
                               <div className="min-w-0">
-                                <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">Gender</p>
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${genderInfo.color}`}>
+                                <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">
+                                  Gender
+                                </p>
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${genderInfo.color}`}
+                                >
                                   {genderInfo.text}
                                 </span>
                               </div>
@@ -180,21 +272,28 @@ function StudentSearchSection() {
 
                             {/* Course Order */}
                             <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                              <Hash size={16} className="text-amber-600 flex-shrink-0" />
+                              <Hash
+                                size={16}
+                                className="text-amber-600 flex-shrink-0"
+                              />
                               <div className="min-w-0">
-                                <p className="text-xs font-medium text-amber-700 uppercase tracking-wide">Course Order</p>
+                                <p className="text-xs font-medium text-amber-700 uppercase tracking-wide">
+                                  Course Order
+                                </p>
                                 <div className="flex flex-wrap gap-1 mt-1">
                                   {courseOrder.length > 0 ? (
                                     <>
-                                      {courseOrder.slice(0, 4).map((courseId, index) => (
-                                        <span
-                                          key={index}
-                                          className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full"
-                                          title={courseId}
-                                        >
-                                          {courseId.replace('C_', '')}
-                                        </span>
-                                      ))}
+                                      {courseOrder
+                                        .slice(0, 4)
+                                        .map((courseId, index) => (
+                                          <span
+                                            key={index}
+                                            className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full"
+                                            title={courseId}
+                                          >
+                                            {courseId.replace("C_", "")}
+                                          </span>
+                                        ))}
                                       {courseOrder.length > 4 && (
                                         <span className="inline-flex items-center justify-center w-6 h-6 bg-amber-200 text-amber-700 text-xs font-bold rounded-full">
                                           +{courseOrder.length - 4}
@@ -202,7 +301,9 @@ function StudentSearchSection() {
                                       )}
                                     </>
                                   ) : (
-                                    <span className="text-xs text-amber-600 italic">No courses assigned</span>
+                                    <span className="text-xs text-amber-600 italic">
+                                      No courses assigned
+                                    </span>
                                   )}
                                 </div>
                               </div>
@@ -216,10 +317,14 @@ function StudentSearchSection() {
                         <button
                           onClick={() => toggleRecommendedCourses(student.id)}
                           className="flex items-center justify-between px-4 py-3 text-left bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg transition-all duration-200 border border-blue-100 w-full md:w-auto min-w-[250px]"
+                          disabled={loadingRecommendations}
                         >
                           <span className="font-medium text-gray-700 flex items-center gap-2">
                             <BookOpen size={16} className="text-blue-600" />
-                            Recommended Courses
+                            {loadingRecommendations &&
+                            expandedStudentId === student.id
+                              ? "Loading..."
+                              : "Recommended Courses"}
                           </span>
                           {expandedStudentId === student.id ? (
                             <ChevronUp size={20} className="text-gray-600" />
@@ -235,30 +340,43 @@ function StudentSearchSection() {
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                               Top Recommendations
                             </h4>
-                            <ul className="space-y-2">
-                              {getRecommendedCourses().map((course, index) => (
-                                <li
-                                  key={course.id}
-                                  className="flex items-center justify-between text-sm p-3 hover:bg-gray-50 rounded-lg transition-colors group"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
-                                      {index + 1}
+
+                            {loadingRecommendations ? (
+                              <div className="flex items-center justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                              </div>
+                            ) : recommendedCourses.length > 0 ? (
+                              <ul className="space-y-2">
+                                {recommendedCourses.map((course, index) => (
+                                  <li
+                                    key={course.id}
+                                    className="flex items-center justify-between text-sm p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                                        {index + 1}
+                                      </div>
+                                      <BookOpen
+                                        size={16}
+                                        className="text-blue-500 group-hover:text-blue-600 transition-colors"
+                                      />
+                                      <span className="text-gray-900 font-medium">
+                                        Course ID: {course.id}
+                                      </span>
                                     </div>
-                                    <BookOpen
-                                      size={16}
-                                      className="text-blue-500 group-hover:text-blue-600 transition-colors"
-                                    />
-                                    <span className="text-gray-900 font-medium">
-                                      {course.title}
+                                    <span className="text-gray-500 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                                      Score: {course.precision.toFixed(3)}
                                     </span>
-                                  </div>
-                                  <span className="text-gray-500 text-xs bg-gray-100 px-2 py-1 rounded-full">
-                                    {course.duration}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="text-center py-4">
+                                <p className="text-gray-500 text-sm">
+                                  No recommendations available
+                                </p>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
