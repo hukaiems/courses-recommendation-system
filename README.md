@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Courses Recommendation System
 
-## Getting Started
+## Overview
+The Courses Recommendation System is a web application designed to help users find students and view recommended courses based on their profiles. The application utilizes a search feature to find students and displays relevant course recommendations.
 
-First, run the development server:
+## Project Structure
+- `src/app/components/student-search-section.tsx`: This file contains the `StudentSearchSection` component, which handles the search functionality for students and displays their details along with recommended courses. It manages state for search queries, student data, and recommended courses, and includes functions for fetching data from an API.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- `package.json`: This file contains metadata about the project, including dependencies, scripts, and project configuration for npm.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `tsconfig.json`: This file is the TypeScript configuration file that specifies the compiler options and the files to include in the compilation.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `README.md`: This file provides documentation for the project, including setup instructions, usage, and features.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
+- Search for students by name.
+- Display student details including gender, school, and course order.
+- Toggle to view recommended courses for each student.
+- Fetch recommended courses from an external API.
 
-## Learn More
+## Installation
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   ```
+2. Navigate to the project directory:
+   ```
+   cd courses-recommendation-system
+   ```
+3. Install the dependencies:
+   ```
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+## Usage
+1. Start the development server:
+   ```
+   npm start
+   ```
+2. Open your browser and navigate to `http://localhost:3000` to access the application.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technologies Used
+- React
+- TypeScript
+- Axios for API requests
+- Lucide-react for icons
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
